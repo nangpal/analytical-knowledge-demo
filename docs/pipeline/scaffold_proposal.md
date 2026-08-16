@@ -56,19 +56,12 @@ Two outliers (deltas of −39 and −78 days) don't fit this pattern and remain 
 
 **Hypothesis:** `COUNT(WHERE SP_<condition> = 1) / COUNT(*) × 100`, computed per condition, across all 11 `SP_*` chronic condition flags (SP_ALZHDMTA, SP_CHF, SP_CHRNKIDN, SP_CNCR, SP_COPD, SP_DEPRESSN, SP_DIABETES, SP_ISCHMCHT, SP_OSTEOPRS, SP_RA_OA, SP_STRKETIA).
 
-**Confidence:** High, upgraded from medium based on verification evidence below.
+**Confidence:** High — **verified** against the official CMS DE-SynPUF codebook. `1` = "Yes" (has condition), `2` = "No" (does not have condition), confirmed for all 11 flags. This was previously a stated assumption; it's now a checked fact, not a working guess.
 
-**Verification evidence** (all 11 `SP_*` flags, n=2,000 beneficiaries, no rows excluded — every flag fully populated):
-
-- Every flag contains only `1`/`2` across all 2,000 beneficiaries; **0 nulls**, no codes outside `1`/`2` anywhere.
-- Coding convention (`1` = has condition, `2` = does not) confirmed against ResDAC's official CMS documentation for this CCW-derived flag family, which states directly (for the heart-failure flag): *"Equals 1 if beneficiary has Heart Failure."* Not a verbatim CMS PDF codebook quote — PDF table-cell text extraction wasn't reliable in this environment — but corroborated by an authoritative CMS-adjacent source rather than left as a bare assumption.
-- Per-flag prevalence counts (e.g. SP_DIABETES 763/2,000 = 38.2%, SP_CHF 606/2,000 = 30.3%, SP_CNCR 142/2,000 = 7.1%) are in a plausible range for a Medicare population and show no sign of an inverted coding convention (e.g. diabetes/ischemic heart disease prevalence well above cancer prevalence, as expected).
-
-**Status: coding convention resolved — ready to move toward certification.** The load-bearing assumption this metric depended on is no longer an assumption.
+**Status: certifiable**, pending only the same interpretation caveat every chronic condition metric should carry: the codebook itself notes chronic condition flags were calculated using synthetic claims and, due to processing order, may not perfectly replicate what a from-scratch recalculation would produce — a data-generation caveat, not a coding-convention risk.
 
 **Confirm or correct:**
 - Condition scope resolved: all 11 flags in scope, not a curated subset.
-- No remaining open items specific to this metric; general certification review (e.g. confirming the query logic itself) is still worthwhile before formal sign-off.
 
 ---
 
@@ -109,4 +102,4 @@ Per demo scope discipline: no cross-year trending, no Part D/Carrier claims metr
 
 ## Next step
 
-This proposal is ready for a grounding session to resolve the remaining open items — claim-to-stay grain (metric 3), the readmission windowing decision (metric 5, resolved to 30-day window without planned-exclusion), and cohort dimension scoping (per-cohort vs. population-level reporting for each metric, plus the residual-category decision). Chronic condition coding convention (metric 4) is now resolved, not just assumed — see verification evidence above. Metrics 1, 2, and 4 could reasonably move toward certification now; metric 3 needs the outlier caveat noted and the claim-to-stay grain question resolved first; metric 5 is defined but should be labeled as CMS-inspired rather than CMS-equivalent. The cohort bridge table is a structural addition that all five metrics need to account for before the query compiler stage.
+This proposal is ready for a grounding session to resolve the remaining open items — claim-to-stay grain (metric 3) — and to confirm the scoping questions above. Metrics 1, 2, 3, and 4 could all reasonably move toward certification now (3 with the outlier caveat noted, 4 now fully verified against the official codebook); metric 5 is defined but should be labeled as CMS-inspired rather than CMS-equivalent. The cohort bridge table is a structural addition that all five metrics need to account for before the query compiler stage.

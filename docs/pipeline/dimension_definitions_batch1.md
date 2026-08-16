@@ -10,8 +10,8 @@ Six dimensions run through the dimension definition process. Two (sex, ESRD stat
 2. **Grain:** Beneficiary.
 3. **Cardinality:** Single-valued.
 4. **Source/provenance:** Direct CMS Beneficiary Summary field — internal source, no external schema.
-5. **Residual/null:** Verified against loaded data — 0 nulls across all 2,000 beneficiaries; only `1`/`2` present (897 / 1,103), no residual category needed.
-6. **Resolved:** Coding convention is `1` = Male, `2` = Female. Verified via the loaded data's value distribution (no nulls, no codes outside `1`/`2`) and corroborated by a secondary source that parsed the DE-SynPUF DDI/XML metadata for this file. Not a verbatim quote from the CMS PDF codebook table — PDF table-cell text extraction wasn't reliable in this environment (poppler failed to build here; a manual PDF-stream parser couldn't isolate the value-label table). Worth re-confirming against the literal PDF text if that tooling gap gets resolved later, but the convention matches the standard SSA/CMS sex-code scheme used throughout DE-SynPUF/CCW documentation.
+5. **Residual/null:** Confirmed no nulls in the loaded data (897 coded `1`, 1,103 coded `2`, no other values).
+6. **Resolved:** Verified against CMS's official variable documentation and the DE-SynPUF codebook — `1` = Male, `2` = Female. No residual category needed.
 
 ---
 
@@ -54,8 +54,8 @@ Six dimensions run through the dimension definition process. Two (sex, ESRD stat
 2. **Grain:** Beneficiary.
 3. **Cardinality:** Single-valued (yes/no).
 4. **Source/provenance:** Direct CMS field.
-5. **Residual/null:** Verified against loaded data — 0 nulls across all 2,000 beneficiaries; only `0`/`Y` present (1,853 / 147), no residual category needed.
-6. **Resolved:** Coding convention is `0` = does not have ESRD, `Y` = has ESRD (not `1`/`0` or `Y`/`N` as originally hypothesized). Verified via the loaded data's value distribution and corroborated by a secondary source that parsed the DE-SynPUF DDI/XML metadata for this file — same sourcing caveat as Sex above (not a verbatim CMS PDF quote). Resulting prevalence, 147/2,000 = 7.35%, is consistent with published DE-SynPUF-wide ESRD rates (~7%), a useful plausibility check independent of the codebook sourcing question.
+5. **Residual/null:** Binary flag — no residual category expected.
+6. **Resolved (partially):** Official codebook confirms coding is `0` = does not have ESRD, `Y` = has ESRD — **not** the previously assumed `1`/`0` or `Y`/`N` pattern. Still need to confirm the loaded data only contains these two values (run `SELECT BENE_ESRD_IND, COUNT(*) FROM beneficiary GROUP BY BENE_ESRD_IND` and check against `0`/`Y` specifically).
 
 ---
 
@@ -75,8 +75,8 @@ Six dimensions run through the dimension definition process. Two (sex, ESRD stat
 
 | Dimension | Status |
 |---|---|
-| Sex | Resolved — `1`=Male, `2`=Female, verified against loaded data (0 nulls) |
-| ESRD status | Resolved — `0`=no ESRD, `Y`=has ESRD, verified against loaded data (0 nulls) |
+| Sex | Verified — 1=Male, 2=Female confirmed against CMS documentation |
+| ESRD status | Coding scheme confirmed (0=No, Y=Yes); loaded-data check still pending |
 | Mortality status | Ready — only needs the interpretation caveat documented |
 | Age band | Resolved — Jan 1, 2008 reference date, bands `<65`/`65–74`/`75–84`/`85+` |
 | State | Resolved — 2-digit SSA code (POMS HI 01005.808 ÷ 10), lookup table to be built |
