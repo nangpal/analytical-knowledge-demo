@@ -18,14 +18,14 @@ For any proposed dimension:
 
 ## Worked example: cohort dimension
 
-1. **Membership hypothesis:** a beneficiary belongs to a condition cohort if their corresponding `SP_*` flag equals `1` (has condition) — noting this inherits the same open coding-convention assumption flagged for metric 4.
+1. **Membership hypothesis:** a beneficiary belongs to a condition cohort if their corresponding `SP_*` flag equals `1` (has condition). This coding convention is now **verified** — confirmed against ResDAC's official documentation for this CCW-derived flag family and against the loaded data (0 nulls, only `1`/`2` present across all 11 flags, all 2,000 beneficiaries) — so cohort membership can be computed as defined without an inherited open item.
 2. **Grain:** per-beneficiary (not per-claim).
 3. **Cardinality:** multi-valued — a beneficiary can belong to multiple condition cohorts simultaneously. Requires the `BENEFICIARY_COHORT` bridge table, not a column on `beneficiary`.
 4. **Source and provenance:** CCW-derived (external, federally validated schema), tracked via `COHORT.SOURCE_SCHEMA` so future custom cohorts remain distinguishable from this one.
 5. **Residual/null category:** **decision needed** — recommend an explicit residual category ("no flagged chronic condition") rather than implicit absence, specifically because metrics like "average reimbursement by cohort" lose their most useful comparison (healthy vs. any condition) if the zero-condition population silently disappears from the slice instead of appearing as its own row.
 6. **Confirm or correct:**
    - Confirm the residual-category recommendation above, or override it with implicit absence if there's a reason the "no condition" population shouldn't be directly comparable.
-   - Coding-convention assumption from metric 4 is inherited here — if that resolves differently than assumed, cohort membership needs to be recomputed, not just the metric.
+   - Coding-convention question is resolved (see step 1) — this dimension no longer carries an inherited open item from metric 4.
 
 ## Why this matters beyond cohort
 
