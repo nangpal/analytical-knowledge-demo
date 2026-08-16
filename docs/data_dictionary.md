@@ -65,10 +65,12 @@ Some fields in this dataset are not simply "populated or missing" — their pres
 
 **Implication for metric definitions:** metrics that touch inpatient-specific or coverage-type-specific fields should state explicitly whether they're scoped to "beneficiaries/claims where this field applies" or "all beneficiaries/claims" — silently averaging across a mixed population where the field means different things in different rows is a common source of subtly wrong numbers.
 
-## Open items to resolve before certifying metrics 3 and 4
+## Open items — resolved
 
-1. **Chronic condition flag coding** — confirm `1`/`2` values in `SP_*` fields against the official DE-SynPUF codebook (some CMS files use `2` for "no" rather than `0`, which changes any `COUNT(WHERE SP_DIABETES = 1)` calculation if misread).
-2. **Length-of-stay validation** — spot-check `CLM_UTLZTN_DAY_CNT` against manual date arithmetic on a sample of claims to confirm they agree before trusting the field as-is.
-3. **Claim-to-stay grain** — check whether any `DESYNPUF_ID` + `CLM_ADMSN_DT` + `PRVDR_NUM` combination appears on more than one `CLM_ID` in the loaded data. If so, "average length of stay" as currently calculated (one row = one claim) may double-count or fragment a small number of actual hospital stays.
+All three original open verification items have been closed:
 
-Until all three are resolved, metrics 3 and 4 should be treated as **draft, not certified** — consistent with the platform's labeled-not-gated certification principle: visible and usable, but explicitly flagged as unverified rather than silently trusted.
+1. ~~Chronic condition flag coding~~ — verified against the official CMS DE-SynPUF codebook: `1` = Yes, `2` = No, confirmed for all 11 `SP_*` flags.
+2. ~~Length-of-stay validation~~ — verified: 95.3% exact match between `CLM_UTLZTN_DAY_CNT` and computed date arithmetic; mismatches explained by the codebook's own definition (excludes discharge/death day and non-covered days). Two large outliers (0.17% of claims) remain unexplained and are documented as a certify-with-caveat item.
+3. ~~Claim-to-stay grain~~ — verified: 0.086% of claims (1 of 1,162) show multiple claims sharing the same beneficiary and admission date, appearing to be a data anomaly rather than the expected split-stay pattern. Documented as a certify-with-caveat item, same treatment as item 2.
+
+Metrics 1–4 are now certifiable (see scaffold proposal for full detail and caveats). Metric 5 (readmission rate) is defined but intentionally simplified relative to the full CMS measure — see scaffold proposal.
